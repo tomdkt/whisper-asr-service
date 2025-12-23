@@ -1,14 +1,16 @@
 services:
   whisper:
-    image: onerahmet/openai-whisper-asr-webservice:latest-gpu
+    build: .
     container_name: whisper-asr
     environment:
       - ASR_MODEL=base          # Options: tiny, base, small, medium, large-v3, turbo
-      - ASR_ENGINE=openai_whisper # faster_whisper, openai_whisper
+      - XDG_CACHE_HOME=/root/.cache
     ports:
       - "9000:9000"
     volumes:
       - ./whisper-cache:/root/.cache/whisper
+      - ./input:/app/input:ro
+      - ./output:/app/output
     deploy:
       resources:
         reservations:
@@ -16,4 +18,4 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
-    restart: "no"
+    restart: "unless-stopped"
